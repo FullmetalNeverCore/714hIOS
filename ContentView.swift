@@ -8,30 +8,54 @@
 import SwiftUI
 import Combine
 
-struct MainView: View {
+struct ContentView: View {
     @AppStorage("ipAddress") private var ipAddress = "192.168.8.152"
-    var pd = PinnedData.getInstance()
     var logo = "https://i.imgur.com/zsk0v7O.png"
+    @State private var isNextScreenActive: Bool = false
+    @State private var showAlert: Bool = false
+    @State private var alertMessage: String = ""
 
     var body: some View {
         NavigationView {
             VStack {
-                TextField("192.168.8.152", text: $ipAddress)
+                TextField("192.168.8.152", text: $ipAddress){
+                   
+                }
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
-                NavigationLink(destination: NextScreen(ipAddress: ipAddress,logo: logo)) {
+                Button(action: {
+                    print("Button Pressed!")
+                    ErrorBanner().checkIP(ip: ipAddress) { success in
+                        if success {
+                            isNextScreenActive = true
+                            print("Request was successful!")
+                        } else {
+                            alertMessage = "No route to server"
+                            print("Request failed.")
+                            showAlert = true
+
+                        }
+                    }
+                }) {
                     Text("Submit")
                         .padding()
                         .foregroundColor(.white)
                         .background(Color.black)
                         .cornerRadius(10)
                 }
+                .alert(isPresented: $showAlert) {
+                    Alert(
+                        title: Text("Error"),
+                        message: Text(alertMessage),
+                        dismissButton: .default(Text("OK"))
+                    )
+                }
+                .sheet(isPresented: $isNextScreenActive, content: {
+                    NextScreen(ipAddress: ipAddress, logo: logo)
+                })
             }
             .padding()
             .navigationTitle("IP Address Entry")
-            .onChange(of: ipAddress) {
-                pd.ip = ipAddress
-            }
         
         }
        
@@ -45,7 +69,6 @@ struct MainView: View {
 struct NextScreen: View {
     var ipAddress: String
     var logo: String
-    var pd = PinnedData.getInstance()
     @State private var charData: [[String: Any]]?
     @Environment(\.presentationMode) var presentationMode
 
@@ -78,7 +101,7 @@ struct NextScreen: View {
                     .font(.headline)
                     .padding()
 
-                Text(pd.ip)
+                Text(ipAddress)
                     .padding()
 
                 List {
@@ -88,7 +111,7 @@ struct NextScreen: View {
                                 if let value = charData[index][key] as? String,
                                    let imageURL = URL(string: value) {
                                     
-                                    NavigationLink(destination: CharacterScreen(link: imageURL,name:key,ipAddress: ipAddress,pd:pd)) {
+                                    NavigationLink(destination: CharacterScreen(link: imageURL,name:key,ipAddress: ipAddress)) {
                                         VStack {
                                             Button(action: {
                                                 // Handle image click action here
@@ -145,7 +168,6 @@ struct CharacterScreen: View {
     var link: URL
     var name: String
     var ipAddress: String
-    var pd: PinnedData
     @State private var chatInput = ""
     @State private var updateInput1 = ""
     @State private var updateInput2 = ""
@@ -324,5 +346,5 @@ struct CharacterScreen: View {
 
 
 #Preview {
-    MainView()
+    ContentView()
 }

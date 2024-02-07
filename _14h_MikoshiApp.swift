@@ -7,10 +7,11 @@
 
 import SwiftUI
 
-struct MikoshiApp: App {
+@main
+struct _14h_MikoshiApp: App {
     var body: some Scene {
         WindowGroup {
-            MainView()
+            ContentView()
         }
     }
 }
