@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  main.swift
 //  714h_Mikoshi
 //
 //  Created by 0xNeverC0RE on 05/02/2024.
@@ -8,7 +8,7 @@
 import SwiftUI
 import Combine
 
-struct ContentView: View {
+struct MainView: View {
     @AppStorage("ipAddress") private var ipAddress = "192.168.8.152"
     var pd = PinnedData.getInstance()
     var logo = "https://i.imgur.com/zsk0v7O.png"
@@ -280,7 +280,7 @@ struct CharacterScreen: View {
         .onAppear(){
             DataEx().jsoCreate(ip:ipAddress,x: "N", y: "toor", z: name, xn: "username", xy: "password", xz: "char", endpoint: "verify_credentials")
         }
-        .navigationBarHidden(true) // Hide navigation bar if needed
+        .navigationBarHidden(true) 
         .navigationBarBackButtonHidden(true)
     }
     func startTimer() {
@@ -324,5 +324,5 @@ struct CharacterScreen: View {
 
 
 #Preview {
-    ContentView()
+    MainView()
 }
