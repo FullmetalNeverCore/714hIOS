@@ -68,7 +68,7 @@ class DataEx
             let engine = "Mistral"// todo: create an engine switcher
             print(String(format: "Engine: %@", engine))
             
-            let urlString = String(format: "http://%@:5001/%@", ip, endpoint) // Assuming config and getIP() are defined somewhere
+            let urlString = String(format: "http://%@:5001/%@", ip, endpoint) 
             guard let url = URL(string: urlString) else {
                 print("Invalid URL")
                 return
