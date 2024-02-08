@@ -6,9 +6,9 @@
 //
 
 import Foundation
+import Network
 
-
-class Network{
+class NetworkStuff{
     
     func checkIP(ip: String, completion: @escaping (Bool) -> Void) {
         let endpointURL = URL(string: "http://\(ip):5001/char_list")!
@@ -41,5 +41,56 @@ class Network{
         }
 
         task.resume()
+    }
+    
+    
+    func getLocalIPAddress(completion: @escaping (String?) -> Void) {
+        var ipAddress: String?
+
+        let monitor = NWPathMonitor()
+        monitor.pathUpdateHandler = { path in
+            if let interface = path.availableInterfaces.first {
+                let interfaceName = interface.name
+                ipAddress = self.getIPAddress(for: interfaceName)
+                print("Local IP Address: \(ipAddress ?? "Not available")")
+            }
+
+            DispatchQueue.main.async {
+                completion(ipAddress)
+            }
+        }
+
+        let queue = DispatchQueue(label: "NetworkMonitor")
+        monitor.start(queue: queue)
+    }
+
+    func getIPAddress(for interface: String) -> String? {
+        var address: String?
+        
+        // Get list of all interfaces on the local machine
+        var ifaddr: UnsafeMutablePointer<ifaddrs>?
+        guard getifaddrs(&ifaddr) == 0 else { return nil }
+        guard let firstAddr = ifaddr else { return nil }
+        
+        // Iterate through the list of interfaces
+        for ifptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
+            let interfaceName = String(cString: ifptr.pointee.ifa_name)
+            
+            if interfaceName == interface {
+                let addrFamily = ifptr.pointee.ifa_addr.pointee.sa_family
+                if addrFamily == AF_INET || addrFamily == AF_INET6 {
+                    
+                    var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                    if (getnameinfo(ifptr.pointee.ifa_addr, socklen_t(ifptr.pointee.ifa_addr.pointee.sa_len),
+                                    &hostname, socklen_t(hostname.count),
+                                    nil, socklen_t(0), NI_NUMERICHOST) == 0) {
+                        address = String(cString: hostname)
+                    }
+                }
+            }
+        }
+        
+        freeifaddrs(ifaddr)
+        return address
     }
 }

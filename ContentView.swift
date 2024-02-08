@@ -8,24 +8,31 @@
 import SwiftUI
 import Combine
 
+
 struct ContentView: View {
     @AppStorage("ipAddress") private var ipAddress = "192.168.8.152"
     var logo = "https://i.imgur.com/zsk0v7O.png"
     @State private var isNextScreenActive: Bool = false
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
+    @State private var locIP: String = "Loading..."
 
     var body: some View {
         NavigationView {
             VStack {
-                TextField("192.168.8.152", text: $ipAddress){
-                   
-                }
+                Text("Device's local IP: \(self.locIP)")
+                    .onAppear {
+                        NetworkStuff().getLocalIPAddress { success in
+                            self.locIP = success ?? "Not available"
+                        }
+                        
+                    }
+                TextField("Enter server's local ip: ", text: $ipAddress)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 Button(action: {
                     print("Button Pressed!")
-                    ErrorBanner().checkIP(ip: ipAddress) { success in
+                    NetworkStuff().checkIP(ip: ipAddress) { success in
                         if success {
                             isNextScreenActive = true
                             print("Request was successful!")
@@ -33,14 +40,13 @@ struct ContentView: View {
                             alertMessage = "No route to server"
                             print("Request failed.")
                             showAlert = true
-
                         }
                     }
                 }) {
                     Text("Submit")
                         .padding()
-                        .foregroundColor(.white)
-                        .background(Color.black)
+                        .foregroundColor(.black)
+                        .background(Color.white)
                         .cornerRadius(10)
                 }
                 .alert(isPresented: $showAlert) {
@@ -50,18 +56,16 @@ struct ContentView: View {
                         dismissButton: .default(Text("OK"))
                     )
                 }
-                .sheet(isPresented: $isNextScreenActive, content: {
+                .sheet(isPresented: $isNextScreenActive) {
                     NextScreen(ipAddress: ipAddress, logo: logo)
-                })
+                }
             }
             .padding()
             .navigationTitle("IP Address Entry")
-        
         }
-       
     }
-    
 }
+
 
 
 
@@ -82,7 +86,7 @@ struct NextScreen: View {
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 200, height: 200)
+                                .frame(width: 150, height: 150)
                         case .failure:
                             Text("Failed to load image")
                         case .empty:
@@ -221,7 +225,7 @@ struct CharacterScreen: View {
                 ScrollView {
                     TextEditor(text: $textContent)
                         .padding()
-                        .background(Color.black.opacity(0.9))
+                        .background(Color.black.opacity(0.8))
                         .foregroundColor(.white)
                         .cornerRadius(10)
                         .padding()
