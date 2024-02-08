@@ -8,7 +8,8 @@
 import Foundation
 
 
-class ErrorBanner{
+class Network{
+    
     func checkIP(ip: String, completion: @escaping (Bool) -> Void) {
         let endpointURL = URL(string: "http://\(ip):5001/char_list")!
 
