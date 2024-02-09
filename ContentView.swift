@@ -73,6 +73,7 @@ struct ContentView: View {
 struct NextScreen: View {
     var ipAddress: String
     var logo: String
+    @State private var showSettings: Bool = false
     @State private var charData: [[String: Any]]?
     @Environment(\.presentationMode) var presentationMode
 
@@ -101,13 +102,17 @@ struct NextScreen: View {
                 }
                 
 
-                Text("Host Address:")
+                Text("Host Address:\(ipAddress)")
                     .font(.headline)
                     .padding()
-
-                Text(ipAddress)
-                    .padding()
-
+                    VStack {
+                        Button(action: {
+                            print("Button Pressed!")
+                            self.showSettings = true
+                        }){
+                            Text("Update NNVals")
+                        }
+                    }
                 List {
                     if let charData = charData {
                         ForEach(charData.indices, id: \.self) { index in
@@ -150,12 +155,16 @@ struct NextScreen: View {
                         }
                     }
                 }
-
+                .sheet(isPresented: $showSettings) {
+                    UNNScreen(ipAddress: ipAddress,logo: logo)
+                }
                 .onAppear {
-                    DataEx().getChars(ip: ipAddress,endp:"char_list") { result in
+                    DataEx().getChars(ip: ipAddress, endp: "char_list") { result in
                         switch result {
                         case .success(let fdata):
-                            self.charData = [fdata]
+                            DispatchQueue.main.async {
+                                self.charData = [fdata]
+                            }
                         case .failure(let error):
                             print("Error fetching charData: \(error)")
                         }
@@ -163,6 +172,89 @@ struct NextScreen: View {
                 }
                 .navigationBarBackButtonHidden(true)
             }
+        }
+    }
+    
+}
+
+
+struct UNNScreen:View{
+    var ipAddress: String
+    var logo: String
+    
+    @State private var updateInput1 = ""
+    @State private var updateInput2 = ""
+    @State private var updateInput3 = ""
+    
+    var body: some View{
+        
+        VStack {
+            
+            if let logoURL = URL(string: logo) {
+                AsyncImage(url: logoURL) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 150, height: 150)
+                    case .failure:
+                        Text("Failed to load image")
+                    case .empty:
+                        ProgressView()
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+                .frame(width: 100, height: 100)
+            } else {
+                Text("Invalid image URL")
+            }
+            TextField("1.0", text: $updateInput1)
+                .padding()
+                .background(Color.black.opacity(0.8))
+                .cornerRadius(10)
+                .padding(.horizontal)
+            
+
+            .padding()
+            .foregroundColor(.white)
+            .cornerRadius(10)
+            .padding(.trailing)
+            
+            TextField("1.0", text: $updateInput2)
+                .padding()
+                .background(Color.black.opacity(0.8))
+                .cornerRadius(10)
+                .padding(.horizontal)
+            
+
+            .padding()
+            .foregroundColor(.white)
+            .cornerRadius(10)
+            .padding(.trailing)
+            
+            TextField("1.0", text: $updateInput3)
+                .padding()
+                .background(Color.black.opacity(0.8))
+                .cornerRadius(10)
+                .padding(.horizontal)
+            
+
+            .padding()
+            .foregroundColor(.white)
+            .cornerRadius(10)
+            .padding(.trailing)
+            
+            Button("Update") {
+                print("Update 3: \(updateInput1) \(updateInput2) \(updateInput3)")
+                DataEx().sendnn(ip: ipAddress, d1: Float(updateInput1) ?? 0.9, d2: Float(updateInput2) ?? 0.75, d3: Float(updateInput3) ?? 0.35)
+            }
+            .padding()
+            .background(Color.black)
+            .foregroundColor(.white)
+            .cornerRadius(10)
+            .padding(.trailing)
         }
     }
     
@@ -218,7 +310,7 @@ struct CharacterScreen: View {
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.black)
+                        .foregroundColor(.blue)
                         .font(.title)
                 }
                 Spacer()
@@ -253,53 +345,6 @@ struct CharacterScreen: View {
                 .padding(.bottom)
                 
                 // Updates Section
-                VStack {
-                    TextField("1.0", text: $updateInput1)
-                        .padding()
-                        .background(Color.black.opacity(0.8))
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                    
-
-                    .padding()
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.trailing)
-                    
-                    TextField("1.0", text: $updateInput2)
-                        .padding()
-                        .background(Color.black.opacity(0.8))
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                    
-
-                    .padding()
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.trailing)
-                    
-                    TextField("1.0", text: $updateInput3)
-                        .padding()
-                        .background(Color.black.opacity(0.8))
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                    
-
-                    .padding()
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.trailing)
-                    
-                    Button("Update") {
-                        print("Update 3: \(updateInput1) \(updateInput2) \(updateInput3)")
-                        DataEx().sendnn(ip: ipAddress, d1: Float(updateInput1) ?? 0.9, d2: Float(updateInput2) ?? 0.75, d3: Float(updateInput3) ?? 0.35)
-                    }
-                    .padding()
-                    .background(Color.black)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.trailing)
-                }
                 .padding(.bottom)
             }
         }
