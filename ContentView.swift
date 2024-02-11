@@ -267,9 +267,7 @@ struct CharacterScreen: View {
     @State private var showBrain : Bool = false
     @State private var chatInput = ""
     @State private var events:String = ""
-    @State private var updateInput1 = ""
-    @State private var updateInput2 = ""
-    @State private var updateInput3 = ""
+    @State private var dcopy : String = ""
     @State private var textContent = "Offline content"
     @Environment(\.presentationMode) var presentationMode
     @State private var timer: Timer.TimerPublisher?
@@ -366,6 +364,7 @@ struct CharacterScreen: View {
         }
         .sheet(isPresented: $showBrain) {
             CharacterMemory(name:name,ipAddress:ipAddress,event:$events)
+            
         }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
@@ -428,12 +427,14 @@ struct CharacterMemory: View {
     var ipAddress: String
     @Binding var event: String
     
+    @State private var ev:String = ""
+    
     var body:some View{
         VStack{
             Spacer()
             Text("\(name)'s memory")
             ScrollView {
-                TextEditor(text: $event)
+                TextEditor(text: $ev)
                     .padding()
                     .background(Color.black.opacity(0.8))
                     .foregroundColor(.white)
@@ -443,8 +444,10 @@ struct CharacterMemory: View {
                 
             }
             Button(action: {
-                print("Button Pressed!")
+                print("Overwriting...")
                 //to be continued
+                DataEx().jsoCreate(ip:ipAddress,x: "brain", y: String(ev), z: "null", xn: "type", xy: "data", xz: "null", endpoint: "upload_stuff")
+                    
             }) {
                 Text("Submit")
                     .padding()
@@ -453,7 +456,11 @@ struct CharacterMemory: View {
                     .cornerRadius(10)
             }
         }
+        .onAppear(){
+            self.ev = event
+        }
     }
+
 }
 #Preview {
     ContentView()
