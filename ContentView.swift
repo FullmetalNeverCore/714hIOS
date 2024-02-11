@@ -264,7 +264,9 @@ struct CharacterScreen: View {
     var link: URL
     var name: String
     var ipAddress: String
+    @State private var showBrain : Bool = false
     @State private var chatInput = ""
+    @State private var events:String = ""
     @State private var updateInput1 = ""
     @State private var updateInput2 = ""
     @State private var updateInput3 = ""
@@ -310,7 +312,7 @@ struct CharacterScreen: View {
                     presentationMode.wrappedValue.dismiss()
                 }) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.blue)
+                        .foregroundColor(.white)
                         .font(.title)
                 }
                 Spacer()
@@ -321,16 +323,19 @@ struct CharacterScreen: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                         .padding()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity) // Adjust the height as needed
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .disabled(true)
+
                 }
-                HStack {
+                VStack{
                     TextField("Type your message...", text: $chatInput)
                         .padding()
                         .background(Color.black.opacity(0.8))
                         .foregroundColor(.white)
                         .cornerRadius(10)
                         .padding(.horizontal)
+                }
+                HStack {
                     
                     Button("Send") {
                         print("Message sent: \(chatInput)")
@@ -341,17 +346,28 @@ struct CharacterScreen: View {
                     .foregroundColor(.white)
                     .cornerRadius(10)
                     .padding(.trailing)
+                    Button(action: {
+                        print("Button Pressed!")
+                        self.showBrain = true
+                    }){
+                        Text("Overwrite")
+                    }
+                    .padding()
+                    .background(Color.black)
+                    .foregroundColor(.red)
+                    .cornerRadius(10)
+                    .padding(.trailing)
                 }
-                .padding(.bottom)
-                
-                // Updates Section
                 .padding(.bottom)
             }
         }
         .onAppear(){
             DataEx().jsoCreate(ip:ipAddress,x: "N", y: "toor", z: name, xn: "username", xy: "password", xz: "char", endpoint: "verify_credentials")
         }
-        .navigationBarHidden(true) 
+        .sheet(isPresented: $showBrain) {
+            CharacterMemory(name:name,ipAddress:ipAddress,event:$events)
+        }
+        .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
     }
     func startTimer() {
@@ -364,12 +380,32 @@ struct CharacterScreen: View {
                     for (key, value) in fdata {
                         print("Key: \(key), Value: \(value)")
                     }
-                    
-                    
+                    // Check if the array is not empty
+                    // Get the last element of the array
+                    if let brValue = fdata["br"] {
+                        if let event = brValue as? String {
+                
+                            events = event
+                        } else if let eventArray = brValue as? [String] {
+                          
+                            if !eventArray.isEmpty {
+                                events = "\(eventArray)"
+                            } else {
+                                events = "Event!"
+                            }
+                        } else {
+                     
+                            print("Error: The value associated with 'br' is of type \(type(of: brValue)), expected String or [String].")
+                        }
+                    } else {
+                
+                        print("Error: Key 'br' not found in the dictionary.")
+                    }
+
                     if let brValue = fdata["text"] as? [String] {
-                        // Check if the array is not empty
+                    
                         if !brValue.isEmpty {
-                            // Get the last element of the array
+                            
                             let lastElement = brValue.last!
                             textContent = "\(name): \(lastElement)"
                         } else {
@@ -385,15 +421,40 @@ struct CharacterScreen: View {
         }
     }
 
-
-
-
-
-
-
 }
 
-
+struct CharacterMemory: View {
+    var name: String
+    var ipAddress: String
+    @Binding var event: String
+    
+    var body:some View{
+        VStack{
+            Spacer()
+            Text("\(name)'s memory")
+            ScrollView {
+                TextEditor(text: $event)
+                    .padding()
+                    .background(Color.black.opacity(0.8))
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+            }
+            Button(action: {
+                print("Button Pressed!")
+                //to be continued
+            }) {
+                Text("Submit")
+                    .padding()
+                    .foregroundColor(.black)
+                    .background(Color.white)
+                    .cornerRadius(10)
+            }
+        }
+    }
+}
 #Preview {
     ContentView()
 }

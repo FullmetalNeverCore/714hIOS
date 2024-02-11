@@ -66,30 +66,30 @@ class NetworkStuff{
 
     func getIPAddress(for interface: String) -> String? {
         var address: String?
-        
+
         // Get list of all interfaces on the local machine
         var ifaddr: UnsafeMutablePointer<ifaddrs>?
         guard getifaddrs(&ifaddr) == 0 else { return nil }
         guard let firstAddr = ifaddr else { return nil }
-        
+
         // Iterate through the list of interfaces
         for ifptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
             let interfaceName = String(cString: ifptr.pointee.ifa_name)
-            
+
             if interfaceName == interface {
                 let addrFamily = ifptr.pointee.ifa_addr.pointee.sa_family
-                if addrFamily == AF_INET || addrFamily == AF_INET6 {
-                    
+                if addrFamily == AF_INET { //AF_INET - IPv4 addr family
                     var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                     if (getnameinfo(ifptr.pointee.ifa_addr, socklen_t(ifptr.pointee.ifa_addr.pointee.sa_len),
                                     &hostname, socklen_t(hostname.count),
                                     nil, socklen_t(0), NI_NUMERICHOST) == 0) {
                         address = String(cString: hostname)
+                        break // Break the loop after finding the first IPv4 address
                     }
                 }
             }
         }
-        
+
         freeifaddrs(ifaddr)
         return address
     }
