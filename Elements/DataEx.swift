@@ -65,7 +65,8 @@ class DataEx
 
     func chatEX(ip:String,endpoint: String, json: [String: String]) {
         do {
-            let engine = "Mistral"// todo: create an engine switcher
+            let engine = eng
+            print(engine)
             print(String(format: "Engine: %@", engine))
             
             let urlString = String(format: "http://%@:5001/%@", ip, endpoint) 

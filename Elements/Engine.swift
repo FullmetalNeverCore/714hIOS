@@ -43,6 +43,11 @@ struct EngineView: View {
             } else {
                 Text("Invalid image URL")
             }
+            Button(action: {
+                print("\(eng)")
+            }){
+                Text("Test")
+            }
             // Radio buttons
             EngineRadioButton(label: .option1, isSelected: $selectedOption)
             EngineRadioButton(label: .option2, isSelected: $selectedOption)
@@ -53,6 +58,7 @@ struct EngineView: View {
             
                 if let selectedOption = selectedOption {
                     print("Selected option: \(selectedOption.rawValue)")
+                    changeEngine(engine: String(selectedOption.rawValue))
                  
                 } else {
                     print("Please select an option before submitting.")
