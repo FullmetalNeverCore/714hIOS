@@ -10,7 +10,7 @@ import Foundation
 
 class DataEx
 {
-    func getChars(ip: String,endp:String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
+    func getJSON(ip:String,endp:String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
         let url = URL(string: "http://\(ip):5001/\(endp)")!
 
         URLSession.shared.dataTask(with: url) { data, _, error in
@@ -111,7 +111,33 @@ class DataEx
             DataEx().jsoCreate(ip:ip,x: String(xyz[x] ?? "???"), y: x, z: "null", xn: "val", xy: "type", xz: "null", endpoint: "nn_vals")
         }
     }
-
     
+    func neofetch(ip: String, completion: @escaping (Result<String, Error>) -> Void) {
+        guard let url = URL(string: "http://\(ip):5001/neofetch") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: 0, userInfo: nil)))
+            return
+        }
+
+        let session = URLSession.shared
+
+        let task = session.dataTask(with: url) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let data = data else {
+                completion(.failure(NSError(domain: "No data received", code: 1, userInfo: nil)))
+                return
+            }
+
+            if let resultString = String(data: data, encoding: .utf8) {
+                completion(.success(resultString))
+            } else {
+                completion(.failure(NSError(domain: "Unable to convert data to string", code: 2, userInfo: nil)))
+            }
+        }
+        task.resume()
+    }
 
 }

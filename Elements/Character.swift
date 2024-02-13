@@ -123,7 +123,7 @@ struct CharacterScreen: View {
     func startTimer() {
         timer = Timer.publish(every: 5, on: .main, in: .common)
         cancellable = timer?.autoconnect().sink { _ in
-            DataEx().getChars(ip: ipAddress, endp: "msg_buffer") { result in
+            DataEx().getJSON(ip: ipAddress, endp: "msg_buffer") { result in
                 switch result {
                 case .success(let fdata):
                     // Print all keys and values in the dictionary for debugging

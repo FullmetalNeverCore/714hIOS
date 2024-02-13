@@ -15,6 +15,7 @@ struct NextScreen: View {
     
     @State private var showSettings: Bool = false
     @State private var showEngine: Bool = false
+    @State private var showServer: Bool = false
     
     @State private var charData: [[String: Any]]?
     
@@ -50,20 +51,20 @@ struct NextScreen: View {
                     .padding()
                     HStack {
                         Button(action: {
-                            print("Button Pressed!")
+                            print("NNVals")
                             self.showSettings = true
                         }){
                             Text("Update NNVals")
                         }
                         Button(action: {
-                            print("Button Pressed!")
+                            print("Engine")
                             self.showEngine = true
                         }){
                             Text("Update Engine")
                         }
                         Button(action: {
-                            print("Button Pressed!")
-                            self.showEngine = true
+                            print("Server Info")
+                            self.showServer = true
                         }){
                             Text("Server Info")
                         }
@@ -116,8 +117,11 @@ struct NextScreen: View {
                 .sheet(isPresented: $showEngine) {
                     EngineView(logo:logo)
                 }
+                .sheet(isPresented: $showServer) {
+                    ServerInfoScreen(ipAddress: ipAddress,logo: logo)
+                }
                 .onAppear {
-                    DataEx().getChars(ip: ipAddress, endp: "char_list") { result in
+                    DataEx().getJSON(ip: ipAddress, endp: "char_list") { result in
                         switch result {
                         case .success(let fdata):
                             DispatchQueue.main.async {
