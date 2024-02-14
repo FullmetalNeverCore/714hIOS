@@ -51,19 +51,19 @@ struct NextScreen: View {
                     .padding()
                     HStack {
                         Button(action: {
-                            print("NNVals")
+//                            print("NNVals")
                             self.showSettings = true
                         }){
                             Text("Update NNVals")
                         }
                         Button(action: {
-                            print("Engine")
+//                            print("Engine")
                             self.showEngine = true
                         }){
                             Text("Update Engine")
                         }
                         Button(action: {
-                            print("Server Info")
+//                            print("Server Info")
                             self.showServer = true
                         }){
                             Text("Server Info")
@@ -80,7 +80,7 @@ struct NextScreen: View {
                                         VStack {
                                             Button(action: {
                                             
-                                                print("Image clicked: \(key)")
+//                                                print("Image clicked: \(key)")
                                             }) {
                                                 AsyncImage(url: imageURL) { phase in
                                                     switch phase {

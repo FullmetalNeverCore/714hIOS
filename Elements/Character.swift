@@ -87,7 +87,7 @@ struct CharacterScreen: View {
                 HStack {
                     
                     Button("Send") {
-                        print("Message sent: \(chatInput)")
+//                        print("Message sent: \(chatInput)")
                         DataEx().jsoCreate(ip:ipAddress,x: String(chatInput), y: "Mistral", z: "null", xn: "chat", xy: "type", xz: "null", endpoint: "chat_exchange")
                     }
                     .padding()
@@ -96,7 +96,7 @@ struct CharacterScreen: View {
                     .cornerRadius(10)
                     .padding(.trailing)
                     Button(action: {
-                        print("Button Pressed!")
+//                        print("Button Pressed!")
                         self.showBrain = true
                     }){
                         Text("Overwrite")
@@ -127,9 +127,9 @@ struct CharacterScreen: View {
                 switch result {
                 case .success(let fdata):
                     // Print all keys and values in the dictionary for debugging
-                    for (key, value) in fdata {
-                        print("Key: \(key), Value: \(value)")
-                    }
+//                    for (key, value) in fdata {
+//                        print("Key: \(key), Value: \(value)")
+//                    }
                     // Check if the array is not empty
                     // Get the last element of the array
                     if let brValue = fdata["br"] {
@@ -195,7 +195,7 @@ struct CharacterMemory: View {
                 
             }
             Button(action: {
-                print("Overwriting...")
+//                print("Overwriting...")
                 //to be continued
                 DataEx().jsoCreate(ip:ipAddress,x: "brain", y: String(ev), z: "null", xn: "type", xy: "data", xz: "null", endpoint: "upload_stuff")
                     

@@ -32,7 +32,7 @@ class NetworkStuff{
             }
 
             if httpResponse.statusCode == 200 {
-                print("Request successful! Continue...")
+//                print("Request successful! Continue...")
                 completion(true)
             } else {
                 print("Error: HTTP status code \(httpResponse.statusCode)")

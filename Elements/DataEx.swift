@@ -55,8 +55,8 @@ class DataEx
         var json = [String: String]()
         
         for (key, value) in xyz {
-            print(key)
-            print(value)
+//            print(key)
+//            print(value)
             json[value] = key
         }
         
@@ -66,8 +66,8 @@ class DataEx
     func chatEX(ip:String,endpoint: String, json: [String: String]) {
         do {
             let engine = eng
-            print(engine)
-            print(String(format: "Engine: %@", engine))
+//            print(engine)
+//            print(String(format: "Engine: %@", engine))
             
             let urlString = String(format: "http://%@:5001/%@", ip, endpoint) 
             guard let url = URL(string: urlString) else {

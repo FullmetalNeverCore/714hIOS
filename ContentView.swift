@@ -31,14 +31,14 @@ struct ContentView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 Button(action: {
-                    print("Button Pressed!")
+//                    print("Button Pressed!")
                     NetworkStuff().checkIP(ip: ipAddress) { success in
                         if success {
                             isNextScreenActive = true
-                            print("Request was successful!")
+//                            print("Request was successful!")
                         } else {
                             alertMessage = "No route to server"
-                            print("Request failed.")
+//                            print("Request failed.")
                             showAlert = true
                         }
                     }
