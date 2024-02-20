@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import Combine
+import Kingfisher
 
 struct CharacterScreen: View {
     var link: URL
@@ -30,23 +31,11 @@ struct CharacterScreen: View {
         
         ZStack {
             // Background Image
-            AsyncImage(url: link) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                        .edgesIgnoringSafeArea(.all)
-                        .overlay(Color.black.opacity(0.3))
-                case .failure:
-                    Text("Failed to load background image")
-                case .empty:
-                    ProgressView()
-                @unknown default:
-                    EmptyView()
-                }
-            }
+            KFImage(link)
+            .resizable()
+            .scaledToFill()
+            .edgesIgnoringSafeArea(.all)
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .navigationTitle("\(name)")
             .onAppear {
                 startTimer()

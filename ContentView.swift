@@ -11,6 +11,7 @@ import Combine
 
 struct ContentView: View {
     @AppStorage("ipAddress") private var ipAddress = "192.168.8.152"
+    
     var logo = "https://i.imgur.com/zsk0v7O.png"
     @State private var isNextScreenActive: Bool = false
     @State private var showAlert: Bool = false

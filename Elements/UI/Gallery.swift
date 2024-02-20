@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Kingfisher
 
 
 struct NextScreen: View {
@@ -16,6 +17,7 @@ struct NextScreen: View {
     @State private var showSettings: Bool = false
     @State private var showEngine: Bool = false
     @State private var showServer: Bool = false
+    @State private var done = false
     
     @State private var charData: [[String: Any]]?
     
@@ -75,30 +77,14 @@ struct NextScreen: View {
                             ForEach(charData[index].keys.sorted(), id: \.self) { key in
                                 if let value = charData[index][key] as? String,
                                    let imageURL = URL(string: value) {
-                                    
-                                    NavigationLink(destination: CharacterScreen(link: imageURL,name:key,ipAddress: ipAddress)) {
+
+                                    NavigationLink(destination: CharacterScreen(link: imageURL, name: key, ipAddress: ipAddress)) {
                                         VStack {
-                                            Button(action: {
-                                            
-//                                                print("Image clicked: \(key)")
-                                            }) {
-                                                AsyncImage(url: imageURL) { phase in
-                                                    switch phase {
-                                                    case .success(let image):
-                                                        image
-                                                            .resizable()
-                                                            .aspectRatio(contentMode: .fit)
-                                                            .frame(width: 500, height: 500)
-                                                    case .failure:
-                                                        Text("Failed to load image")
-                                                    case .empty:
-                                                        ProgressView()
-                                                    @unknown default:
-                                                        EmptyView()
-                                                    }
-                                                }
-                                                .frame(width: 500, height: 500)
-                                            }
+                                            KFImage(imageURL)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fit)
+                                                .ignoresSafeArea()
+                                                .frame(width: 450, height: 450)
 
                                             Text("\(key):")
                                                 .bold()
@@ -134,8 +120,8 @@ struct NextScreen: View {
                 }
                 .navigationBarBackButtonHidden(true)
             }
+            
         }
     }
     
 }
-
