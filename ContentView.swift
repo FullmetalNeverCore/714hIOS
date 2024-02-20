@@ -20,49 +20,54 @@ struct ContentView: View {
 
     var body: some View {
         NavigationView {
-            VStack {
-                Text("Device's local IP: \(self.locIP)")
-                    .onAppear {
-                        NetworkStuff().getLocalIPAddress { success in
-                            self.locIP = success ?? "Not available"
+            ZStack{
+                LinearGradient(gradient: Gradient(colors: [.black, .black,.red]), startPoint: .top, endPoint: .bottom)
+                    .blur(radius: 80)
+                    .ignoresSafeArea()
+                VStack {
+                    Text("Device's local IP: \(self.locIP)")
+                        .onAppear {
+                            NetworkStuff().getLocalIPAddress { success in
+                                self.locIP = success ?? "Not available"
+                            }
+                            
                         }
-                        
-                    }
-                TextField("Enter server's local ip: ", text: $ipAddress)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-                Button(action: {
-//                    print("Button Pressed!")
-                    NetworkStuff().checkIP(ip: ipAddress) { success in
-                        if success {
-                            isNextScreenActive = true
-//                            print("Request was successful!")
-                        } else {
-                            alertMessage = "No route to server"
-//                            print("Request failed.")
-                            showAlert = true
-                        }
-                    }
-                }) {
-                    Text("Submit")
+                    TextField("Enter server's local ip: ", text: $ipAddress)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding()
-                        .foregroundColor(.black)
-                        .background(Color.white)
-                        .cornerRadius(10)
+                    Button(action: {
+                        //                    print("Button Pressed!")
+                        NetworkStuff().checkIP(ip: ipAddress) { success in
+                            if success {
+                                isNextScreenActive = true
+                                //                            print("Request was successful!")
+                            } else {
+                                alertMessage = "No route to server"
+                                //                            print("Request failed.")
+                                showAlert = true
+                            }
+                        }
+                    }) {
+                        Text("Submit")
+                            .padding()
+                            .foregroundColor(.black)
+                            .background(Color.white)
+                            .cornerRadius(10)
+                    }
+                    .alert(isPresented: $showAlert) {
+                        Alert(
+                            title: Text("Error"),
+                            message: Text(alertMessage),
+                            dismissButton: .default(Text("OK"))
+                        )
+                    }
+                    .sheet(isPresented: $isNextScreenActive) {
+                        NextScreen(ipAddress: ipAddress, logo: logo)
+                    }
                 }
-                .alert(isPresented: $showAlert) {
-                    Alert(
-                        title: Text("Error"),
-                        message: Text(alertMessage),
-                        dismissButton: .default(Text("OK"))
-                    )
-                }
-                .sheet(isPresented: $isNextScreenActive) {
-                    NextScreen(ipAddress: ipAddress, logo: logo)
-                }
+                .padding()
+                .navigationTitle("IP Address Entry")
             }
-            .padding()
-            .navigationTitle("IP Address Entry")
         }
     }
 }

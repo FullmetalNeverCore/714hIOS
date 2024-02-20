@@ -25,102 +25,116 @@ struct NextScreen: View {
 
     var body: some View {
         NavigationView {
-            VStack {
-                if let logoURL = URL(string: logo) {
-                    AsyncImage(url: logoURL) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 150, height: 150)
-                        case .failure:
-                            Text("Failed to load image")
-                        case .empty:
-                            ProgressView()
-                        @unknown default:
-                            EmptyView()
+            ZStack {
+                LinearGradient(gradient: Gradient(colors: [.black,.red]), startPoint: .top, endPoint: .bottom)
+                    .blur(radius: 40)
+                    .ignoresSafeArea()
+                VStack {
+                    Spacer()
+                    if let logoURL = URL(string: logo) {
+                        AsyncImage(url: logoURL) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 150, height: 150)
+                            case .failure:
+                                Text("Failed to load image")
+                            case .empty:
+                                ProgressView()
+                            @unknown default:
+                                EmptyView()
+                            }
                         }
+                        .frame(width: 100, height: 100)
+                    } else {
+                        Text("Invalid image URL")
                     }
-                    .frame(width: 100, height: 100)
-                } else {
-                    Text("Invalid image URL")
-                }
-                
-
-                Text("Host Address:\(ipAddress)")
-                    .font(.headline)
-                    .padding()
+                    
+                    
+                    Text("Host Address:\(ipAddress)")
+                        .font(.headline)
+                        .padding()
                     HStack {
                         Button(action: {
-//                            print("NNVals")
-                            self.showSettings = true
-                        }){
-                            Text("Update NNVals")
-                        }
-                        Button(action: {
-//                            print("Engine")
+                            //                            print("Engine")
                             self.showEngine = true
                         }){
                             Text("Update Engine")
+                                .foregroundColor(.white)
                         }
                         Button(action: {
-//                            print("Server Info")
+                            //                            print("Server Info")
                             self.showServer = true
                         }){
                             Text("Server Info")
+                                .foregroundColor(.white)
                         }
                     }
-                List {
-                    if let charData = charData {
-                        ForEach(charData.indices, id: \.self) { index in
-                            ForEach(charData[index].keys.sorted(), id: \.self) { key in
-                                if let value = charData[index][key] as? String,
-                                   let imageURL = URL(string: value) {
+                    List {
+                        if let charData = charData {
+                            ForEach(charData.indices, id: \.self) { index in
+                                ForEach(charData[index].keys.sorted(), id: \.self) { key in
+                                    if let value = charData[index][key] as? String,
+                                       let imageURL = URL(string: value) {
+                                        
+                                        NavigationLink(destination: CharacterScreen(link: imageURL, name: key, ipAddress: ipAddress)) {
+                                            VStack {
 
-                                    NavigationLink(destination: CharacterScreen(link: imageURL, name: key, ipAddress: ipAddress)) {
-                                        VStack {
-                                            KFImage(imageURL)
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fit)
-                                                .ignoresSafeArea()
-                                                .frame(width: 450, height: 450)
-
-                                            Text("\(key):")
-                                                .bold()
+                                                KFImage(imageURL)
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fit)
+                                                    .ignoresSafeArea()
+                                                    .frame(width: 450, height: 450)
+                                                
+                                                Text("\(key):")
+                                                    .bold()
+                                            }
                                         }
+//                                        .listRowBackground(LinearGradient(gradient: Gradient(colors: [.black, .red]), startPoint: .top, endPoint: .bottom)
+//                                            .blur(radius: 10)
+//                                            .ignoresSafeArea()
+//                                            .edgesIgnoringSafeArea(.all))
+                                    } else {
+                                        Text("Invalid image URL")
                                     }
-                                } else {
-                                    Text("Invalid image URL")
                                 }
                             }
                         }
                     }
-                }
-                .sheet(isPresented: $showSettings) {
-                    UNNScreen(ipAddress: ipAddress,logo: logo)
-                }
-                .sheet(isPresented: $showEngine) {
-                    EngineView(logo:logo)
-                }
-                .sheet(isPresented: $showServer) {
-                    ServerInfoScreen(ipAddress: ipAddress,logo: logo)
-                }
-                .onAppear {
-                    DataEx().getJSON(ip: ipAddress, endp: "char_list") { result in
-                        switch result {
-                        case .success(let fdata):
-                            DispatchQueue.main.async {
-                                self.charData = [fdata]
-                            }
-                        case .failure(let error):
-                            print("Error fetching charData: \(error)")
+                    .background(
+                        LinearGradient(gradient: Gradient(colors: [.black, .red]), startPoint: .top, endPoint: .bottom)
+                            .blur(radius: 10)
+                    )
+                    .ignoresSafeArea()
+                    .sheet(isPresented: $showEngine) {
+                        NavigationView {
+                            EngineView(ipAddress: ipAddress, logo: logo)
+                                .navigationBarTitle("IP Address Entry")
                         }
                     }
+                    .sheet(isPresented: $showServer) {
+                        NavigationView {
+                            ServerInfoScreen(ipAddress: ipAddress,logo: logo)
+                        }
+                    }
+                    .onAppear {
+                        DataEx().getJSON(ip: ipAddress, endp: "char_list") { result in
+                            switch result {
+                            case .success(let fdata):
+                                DispatchQueue.main.async {
+                                    self.charData = [fdata]
+                                }
+                            case .failure(let error):
+                                print("Error fetching charData: \(error)")
+                            }
+                        }
+                    }
+                    .navigationBarBackButtonHidden(true)
                 }
-                .navigationBarBackButtonHidden(true)
+                
             }
-            
         }
     }
     
