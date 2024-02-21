@@ -12,6 +12,8 @@ import Combine
 struct ContentView: View {
     @AppStorage("ipAddress") private var ipAddress = "192.168.8.152"
     
+    private var generator = UIImpactFeedbackGenerator(style: .medium)
+    
     var logo = "https://i.imgur.com/zsk0v7O.png"
     @State private var isNextScreenActive: Bool = false
     @State private var showAlert: Bool = false
@@ -40,9 +42,11 @@ struct ContentView: View {
                         NetworkStuff().checkIP(ip: ipAddress) { success in
                             if success {
                                 isNextScreenActive = true
+                                HapticFeedbackSelection.heavy.trigger()
                                 //                            print("Request was successful!")
                             } else {
                                 alertMessage = "No route to server"
+                                HapticFeedbackSelection.light.trigger()
                                 //                            print("Request failed.")
                                 showAlert = true
                             }

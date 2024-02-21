@@ -58,15 +58,18 @@ struct NextScreen: View {
                         .padding()
                     HStack {
                         Button(action: {
-                            //                            print("Engine")
+           
                             self.showEngine = true
+                            HapticFeedbackSelection.medium.trigger()
                         }){
                             Text("Update Engine")
                                 .foregroundColor(.white)
                         }
+
                         Button(action: {
-                            //                            print("Server Info")
+   
                             self.showServer = true
+                            HapticFeedbackSelection.medium.trigger()
                         }){
                             Text("Server Info")
                                 .foregroundColor(.white)
@@ -81,13 +84,12 @@ struct NextScreen: View {
                                         
                                         NavigationLink(destination: CharacterScreen(link: imageURL, name: key, ipAddress: ipAddress)) {
                                             VStack {
-
                                                 KFImage(imageURL)
                                                     .resizable()
                                                     .aspectRatio(contentMode: .fit)
                                                     .ignoresSafeArea()
                                                     .frame(width: 450, height: 450)
-                                                
+
                                                 Text("\(key):")
                                                     .bold()
                                             }

@@ -77,6 +77,7 @@ struct CharacterScreen: View {
                     
                     Button("Send") {
 //                        print("Message sent: \(chatInput)")
+                        HapticFeedbackSelection.heavy.trigger()
                         DataEx().jsoCreate(ip:ipAddress,x: String(chatInput), y: "Mistral", z: "null", xn: "chat", xy: "type", xz: "null", endpoint: "chat_exchange")
                     }
                     .padding()
@@ -87,6 +88,7 @@ struct CharacterScreen: View {
                     Button(action: {
 //                        print("Button Pressed!")
                         self.showBrain = true
+                        HapticFeedbackSelection.medium.trigger()
                     }){
                         Text("Overwrite")
                     }
@@ -110,7 +112,7 @@ struct CharacterScreen: View {
         .navigationBarBackButtonHidden(true)
     }
     func startTimer() {
-        timer = Timer.publish(every: 5, on: .main, in: .common)
+        timer = Timer.publish(every: 2, on: .main, in: .common)
         cancellable = timer?.autoconnect().sink { _ in
             DataEx().getJSON(ip: ipAddress, endp: "msg_buffer") { result in
                 switch result {
@@ -186,6 +188,7 @@ struct CharacterMemory: View {
             Button(action: {
 //                print("Overwriting...")
                 //to be continued
+                HapticFeedbackSelection.heavy.trigger()
                 DataEx().jsoCreate(ip:ipAddress,x: "brain", y: String(ev), z: "null", xn: "type", xy: "data", xz: "null", endpoint: "upload_stuff")
                     
             }) {
