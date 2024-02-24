@@ -39,7 +39,7 @@ struct ServerInfoScreen:View{
                     
                 }
                 .background(
-                    LinearGradient(gradient: Gradient(colors: [.black, .black, .red]), startPoint: .top, endPoint: .bottom)
+                    LinearGradient(gradient: Gradient(colors: [.black, .black, Color(hex: 0xB30026)]), startPoint: .top, endPoint: .bottom)
                         .blur(radius: 80)
                         .ignoresSafeArea()
                 )

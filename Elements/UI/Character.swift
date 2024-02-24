@@ -28,7 +28,6 @@ struct CharacterScreen: View {
 
     
     var body: some View {
-        
         ZStack {
             // Background Image
             KFImage(link)
@@ -39,6 +38,8 @@ struct CharacterScreen: View {
             .navigationTitle("\(name)")
             .onAppear {
                 startTimer()
+                print(name)
+                print(link)
             }
             .onDisappear {
                 cancellable?.cancel()
@@ -72,6 +73,9 @@ struct CharacterScreen: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                         .padding(.horizontal)
+                        .onChange(of:chatInput){nv in
+                            HapticFeedbackSelection.light.trigger()
+                        }
                 }
                 HStack {
                     
