@@ -87,7 +87,7 @@ class DataEx
                 if let error = error {
                     print("Error: \(error)")
                 } else if let httpResponse = response as? HTTPURLResponse {
-                    sendNotification(title: "Mikoshi->Host", subtitle: "", body:"Host accepted the request.", id: "Mikoshi")
+//                    sendNotification(title: "Mikoshi->Host", subtitle: "", body:"Host accepted the request.", id: "Mikoshi")
                     print("EXCHANGE_STATUS: \(httpResponse.statusCode)")
                 }
                 

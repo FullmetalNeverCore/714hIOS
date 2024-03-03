@@ -32,6 +32,7 @@ class NetworkStuff{
             }
 
             if httpResponse.statusCode == 200 {
+                sendNotification(title: "Mikoshi->User", subtitle: "", body: "Connection confirmed!Welcome back!", id: "MNS")
 //                print("Request successful! Continue...")
                 completion(true)
             } else {

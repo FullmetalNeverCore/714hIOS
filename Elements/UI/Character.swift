@@ -113,13 +113,13 @@ struct CharacterScreen: View{
                     .foregroundColor(.white)
                     .cornerRadius(10)
                     .padding(.trailing)
-                    Button("Notification Test") {
-//
-                        HapticFeedbackSelection.heavy.trigger()
-                        print("btn pressed")
-                        print(idnoti)
-                        sendNotification(title: "Mikoshi", subtitle: "", body: "\(name) send a message",id:"Mikoshi")
-                    }
+//                    Button("Notification Test") {
+////
+//                        HapticFeedbackSelection.heavy.trigger()
+//                        print("btn pressed")
+//                        print(idnoti)
+//                        sendNotification(title: "Mikoshi", subtitle: "", body: "\(name) send a message",id:"Mikoshi")
+//                    }
                     .padding()
                     .background(Color.black)
                     .foregroundColor(.white)

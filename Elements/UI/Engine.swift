@@ -91,7 +91,7 @@ struct EngineView: View {
                     Button("Update") {
                         print("Update 3: \(updateInput1) \(updateInput2) \(updateInput3)")
                         HapticFeedbackSelection.heavy.trigger()
-                        sendNotification(title: "Mikoshi->Host", subtitle: "", body:"Data has been sent", id: "Mikoshi")
+                        sendNotification(title: "Mikoshi->Host", subtitle: "", body:"NN values has been updated!", id: "Mikoshi")
                         DataEx().sendnn(ip: ipAddress, d1: Float(updateInput1) ?? 0.9, d2: Float(updateInput2) ?? 0.75, d3: Float(updateInput3) ?? 0.35)
                     }
                     .padding()
