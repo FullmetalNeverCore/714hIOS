@@ -71,6 +71,7 @@ class DataEx
             
             let urlString = String(format: "http://%@:5001/%@", ip, endpoint) 
             guard let url = URL(string: urlString) else {
+                sendNotification(title: "Mikoshi->Host", subtitle: "", body:"Invalid URL", id: "Mikoshi")
                 print("Invalid URL")
                 return
             }
@@ -86,6 +87,7 @@ class DataEx
                 if let error = error {
                     print("Error: \(error)")
                 } else if let httpResponse = response as? HTTPURLResponse {
+                    sendNotification(title: "Mikoshi->Host", subtitle: "", body:"Host accepted the request.", id: "Mikoshi")
                     print("EXCHANGE_STATUS: \(httpResponse.statusCode)")
                 }
                 
@@ -114,6 +116,7 @@ class DataEx
     
     func neofetch(ip: String, completion: @escaping (Result<String, Error>) -> Void) {
         guard let url = URL(string: "http://\(ip):5001/neofetch") else {
+            sendNotification(title: "Mikoshi-Host", subtitle: "", body:"Invalid URL", id: "Mikoshi")
             completion(.failure(NSError(domain: "Invalid URL", code: 0, userInfo: nil)))
             return
         }
@@ -134,6 +137,7 @@ class DataEx
             if let resultString = String(data: data, encoding: .utf8) {
                 completion(.success(resultString))
             } else {
+
                 completion(.failure(NSError(domain: "Unable to convert data to string", code: 2, userInfo: nil)))
             }
         }

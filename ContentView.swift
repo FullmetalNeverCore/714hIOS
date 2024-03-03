@@ -9,8 +9,12 @@ import SwiftUI
 import Combine
 
 
+class IPModel: ObservableObject {
+    static let shared = IPModel()
+    @Published var ipAddress: String = "192.168.8.152"
+}
 struct ContentView: View {
-    @AppStorage("ipAddress") private var ipAddress = "192.168.8.152"
+    @ObservedObject private var ipAddr = IPModel.shared
     
     private var generator = UIImpactFeedbackGenerator(style: .medium)
     
@@ -34,12 +38,12 @@ struct ContentView: View {
                             }
                             
                         }
-                    TextField("Enter server's local ip: ", text: $ipAddress)
+                    TextField("Enter server's local ip: ", text: $ipAddr.ipAddress)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding()
                     Button(action: {
                         //                    print("Button Pressed!")
-                        NetworkStuff().checkIP(ip: ipAddress) { success in
+                        NetworkStuff().checkIP(ip: ipAddr.ipAddress) { success in
                             if success {
                                 isNextScreenActive = true
                                 HapticFeedbackSelection.heavy.trigger()
@@ -66,7 +70,7 @@ struct ContentView: View {
                         )
                     }
                     .sheet(isPresented: $isNextScreenActive) {
-                        NextScreen(ipAddress: ipAddress, logo: logo)
+                        NextScreen(ipAddress: ipAddr.ipAddress, logo: logo)
                     }
                 }
                 .padding()

@@ -10,7 +10,13 @@ import SwiftUI
 import Combine
 import Kingfisher
 
-struct CharacterScreen: View {
+
+class DataModel: ObservableObject {
+    static let shared = DataModel()
+    @Published var textContent: String = "Offline Content"
+}
+
+struct CharacterScreen: View{
     var link: URL
     var name: String
     var ipAddress: String
@@ -19,9 +25,14 @@ struct CharacterScreen: View {
     @State private var chatInput = ""
     @State private var events:String = ""
     @State private var dcopy : String = ""
-    @State private var textContent = "Offline content"
+    @ObservedObject private var textContent = DataModel.shared
+    @State private var txCont : String = ""
+    @State private var idnoti = "dentifier_\(Date().timeIntervalSince1970)"
+    @State private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+
     
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.scenePhase) private var scenePhase //helps checking app's states
     @State private var timer: Timer.TimerPublisher?
     @State private var cancellable: AnyCancellable?
     @State private var msgData: [[String: Any]]?
@@ -44,6 +55,19 @@ struct CharacterScreen: View {
             .onDisappear {
                 cancellable?.cancel()
             }
+            .onChange(of: scenePhase) { newPhase in
+                switch newPhase {
+                case .active:
+                    startTimer()
+                case .inactive:
+                    cancellable?.cancel()
+                case .background:
+                    cancellable?.cancel()
+                    print("background")
+                @unknown default:
+                    break
+                }
+            }
             
             // Chat Box
             VStack {
@@ -56,7 +80,7 @@ struct CharacterScreen: View {
                 }
                 Spacer()
                 ScrollView {
-                    TextEditor(text: $textContent)
+                    TextEditor(text: $txCont)
                         .padding()
                         .background(Color.black.opacity(0.8))
                         .foregroundColor(.white)
@@ -89,6 +113,18 @@ struct CharacterScreen: View {
                     .foregroundColor(.white)
                     .cornerRadius(10)
                     .padding(.trailing)
+                    Button("Notification Test") {
+//
+                        HapticFeedbackSelection.heavy.trigger()
+                        print("btn pressed")
+                        print(idnoti)
+                        sendNotification(title: "Mikoshi", subtitle: "", body: "\(name) send a message",id:"Mikoshi")
+                    }
+                    .padding()
+                    .background(Color.black)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                    .padding(.trailing)
                     Button(action: {
 //                        print("Button Pressed!")
                         self.showBrain = true
@@ -105,6 +141,9 @@ struct CharacterScreen: View {
                 .padding(.bottom)
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name(rawValue: "Mikoshi"))) { _ in
+            print("Notification sent")
+        }
         .onAppear(){
             DataEx().jsoCreate(ip:ipAddress,x: "N", y: "toor", z: name, xn: "username", xy: "password", xz: "char", endpoint: "verify_credentials")
         }
@@ -115,18 +154,16 @@ struct CharacterScreen: View {
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
     }
+    
     func startTimer() {
         timer = Timer.publish(every: 2, on: .main, in: .common)
         cancellable = timer?.autoconnect().sink { _ in
             DataEx().getJSON(ip: ipAddress, endp: "msg_buffer") { result in
                 switch result {
                 case .success(let fdata):
-                    // Print all keys and values in the dictionary for debugging
 //                    for (key, value) in fdata {
 //                        print("Key: \(key), Value: \(value)")
 //                    }
-                    // Check if the array is not empty
-                    // Get the last element of the array
                     if let brValue = fdata["br"] {
                         if let event = brValue as? String {
                 
@@ -152,7 +189,9 @@ struct CharacterScreen: View {
                         if !brValue.isEmpty {
                             
                             let lastElement = brValue.last!
-                            textContent = "\(name): \(lastElement)"
+                            print("updtd")
+//                            textContent.textContent = lastElement
+                            txCont = "\(name): \(lastElement)"
                         } else {
                             print("The array is empty.")
                         }
@@ -165,8 +204,8 @@ struct CharacterScreen: View {
             }
         }
     }
-
 }
+
 
 struct CharacterMemory: View {
     var name: String
@@ -194,6 +233,7 @@ struct CharacterMemory: View {
                 //to be continued
                 HapticFeedbackSelection.heavy.trigger()
                 DataEx().jsoCreate(ip:ipAddress,x: "brain", y: String(ev), z: "null", xn: "type", xy: "data", xz: "null", endpoint: "upload_stuff")
+                sendNotification(title: "Mikoshi->Host", subtitle: "", body:"Memory has been overwritten.", id: "Mikoshi")
                     
             }) {
                 Text("Submit")

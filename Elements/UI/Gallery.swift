@@ -19,6 +19,7 @@ struct NextScreen: View {
     @State private var showEngine: Bool = false
     @State private var showServer: Bool = false
     @State private var done = false
+    @ObservedObject var ipAddr = IPModel.shared
     
     @State private var charData: [[String: Any]]?
     
@@ -54,7 +55,7 @@ struct NextScreen: View {
                     }
                     
                     
-                    Text("Host Address:\(ipAddress)")
+                    Text("Host Address:\(ipAddr.ipAddress)")
                         .font(.headline)
                         .padding()
                     HStack {

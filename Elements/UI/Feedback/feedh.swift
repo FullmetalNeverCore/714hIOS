@@ -28,3 +28,24 @@ enum HapticFeedbackSelection {
             generator.impactOccurred()
         }
 }
+
+func sendNotification(title: String, subtitle: String, body: String,id:String) {
+    let noti = UNMutableNotificationContent()
+    noti.title = title
+    noti.subtitle = subtitle
+    noti.body = body
+
+    let identifier = id
+    print(identifier)
+
+    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+
+    let request = UNNotificationRequest(identifier: identifier, content: noti, trigger: trigger)
+
+    UNUserNotificationCenter.current().add(request) { (error) in
+        if let error = error {
+            print("Error scheduling notification: \(error.localizedDescription)")
+        }
+    }
+    print("noti sent")
+}
