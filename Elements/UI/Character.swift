@@ -29,6 +29,9 @@ struct CharacterScreen: View{
     @State private var txCont : String = ""
     @State private var idnoti = "dentifier_\(Date().timeIntervalSince1970)"
     @State private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+    @State private var opnEngSttngs:Bool = false
+    @State private var isLongPressing = false
+    @State private var isTapped = false
 
     
     @Environment(\.presentationMode) var presentationMode
@@ -103,10 +106,38 @@ struct CharacterScreen: View{
                 }
                 HStack {
                     
-                    Button("Send") {
-//                        print("Message sent: \(chatInput)")
+                    Button(action: {
+                        isTapped = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            isTapped = false
+                            
+                            HapticFeedbackSelection.light.trigger()
+                            DataEx().jsoCreate(ip: ipAddress, x: String(chatInput), y: eng, z: "null", xn: "chat", xy: "type", xz: "null", endpoint: "chat_exchange")
+                        }
+                    }) {
+                        Text("Send")
+                            .padding()
+                            .foregroundColor(isLongPressing ? Color.red : (isTapped ? Color.blue : Color.white))
+                            .background(.black)
+                            .cornerRadius(10)
+                    }
+                    .gesture(
+                        LongPressGesture(minimumDuration: 0.5)
+                            .onChanged { _ in
+                                isLongPressing = true
+                            }
+                            .onEnded { _ in
+                                HapticFeedbackSelection.heavy.trigger()
+                                DataEx().jsoCreate(ip: ipAddress, x: String(chatInput)+"ANSWER SHOULD BE VERY DESCRIPTIVE", y: eng, z: "null", xn: "chat", xy: "type", xz: "null", endpoint: "chat_exchange")
+                                isLongPressing = false
+                         
+                            }
+                    )
+                    .padding(.trailing)
+                    Button("Engine") {
                         HapticFeedbackSelection.heavy.trigger()
-                        DataEx().jsoCreate(ip:ipAddress,x: String(chatInput), y: "Mistral", z: "null", xn: "chat", xy: "type", xz: "null", endpoint: "chat_exchange")
+                        opnEngSttngs = true
+                        
                     }
                     .padding()
                     .background(Color.black)
@@ -120,11 +151,11 @@ struct CharacterScreen: View{
 //                        print(idnoti)
 //                        sendNotification(title: "Mikoshi", subtitle: "", body: "\(name) send a message",id:"Mikoshi")
 //                    }
-                    .padding()
-                    .background(Color.black)
-                    .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.trailing)
+//                    .padding()
+//                    .background(Color.black)
+//                    .foregroundColor(.white)
+//                    .cornerRadius(10)
+//                    .padding(.trailing)
                     Button(action: {
 //                        print("Button Pressed!")
                         self.showBrain = true
@@ -150,6 +181,12 @@ struct CharacterScreen: View{
         .sheet(isPresented: $showBrain) {
             CharacterMemory(name:name,ipAddress:ipAddress,event:$events)
             
+        }
+        .sheet(isPresented: $opnEngSttngs) {
+            NavigationView {
+                EngineView(ipAddress: ipAddress, logo: "logo")
+                    .navigationBarTitle("IP Address Entry")
+            }
         }
         .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
@@ -191,6 +228,7 @@ struct CharacterScreen: View{
                             let lastElement = brValue.last!
                             print("updtd")
 //                            textContent.textContent = lastElement
+//                            if(lastElement.contains(name))
                             txCont = "\(name): \(lastElement)"
                         } else {
                             print("The array is empty.")

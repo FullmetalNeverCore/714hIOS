@@ -19,29 +19,47 @@ struct EngineView: View {
         case option1 = "Mistral"
         case option2 = "gpt-3.5-turbo"
         case option3 = "gpt3"
+        case option4 = "alpindale/goliath-120b"
+        case option5 = "neversleep/noromaid-mixtral-8x7b-instruct"
+        case option6 = "openai/gpt-4-turbo-preview"
+        case option7 = "lizpreciatior/lzlv-70b-fp16-hf"
+        case option8 = "sophosympatheia/midnight-rose-70b"
+        case option9 = "jondurbin/airoboros-l2-70b"
+        case option10 = "neversleep/noromaid-20b"
+        case option11 = "koboldai/psyfighter-13b-2"
     }
     
     @State private var updateInput1 = ""
     @State private var updateInput2 = ""
     @State private var updateInput3 = ""
+    
 
     var body: some View {
         NavigationView {
             ZStack{
                 VStack {
-                    
-                    EngineRadioButton(label: .option1, isSelected: $selectedOption)
-                    EngineRadioButton(label: .option2, isSelected: $selectedOption)
-                    EngineRadioButton(label: .option3, isSelected: $selectedOption)
-                    
-                    
+                    List{
+                        EngineRadioButton(label: .option1, isSelected: $selectedOption)
+                        EngineRadioButton(label: .option2, isSelected: $selectedOption)
+                        EngineRadioButton(label: .option3, isSelected: $selectedOption)
+                        EngineRadioButton(label: .option4, isSelected: $selectedOption)
+                        EngineRadioButton(label: .option5, isSelected: $selectedOption)
+                        EngineRadioButton(label: .option6, isSelected: $selectedOption)
+                        EngineRadioButton(label: .option7, isSelected: $selectedOption)
+                        EngineRadioButton(label: .option8, isSelected: $selectedOption)
+                        EngineRadioButton(label: .option9, isSelected: $selectedOption)
+                        EngineRadioButton(label: .option10, isSelected: $selectedOption)
+                        EngineRadioButton(label: .option11, isSelected: $selectedOption)
+                    }
                     Button("Submit") {
                         
                         if let selectedOption = selectedOption {
                             print("Selected option: \(selectedOption.rawValue)")
                             HapticFeedbackSelection.heavy.trigger()
                             sendNotification(title: "Mikoshi->Host", subtitle: "", body:"Engine has been updated", id: "Mikoshi")
+                            
                             changeEngine(engine: String(selectedOption.rawValue))
+                            print(eng)
                             
                         } else {
                             print("Please select an option before submitting.")
