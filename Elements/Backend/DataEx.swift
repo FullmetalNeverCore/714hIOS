@@ -10,8 +10,34 @@ import Foundation
 
 class DataEx
 {
+    func getPing(ip: String, endp: String,completion: @escaping (Result<String, Error>) -> Void) {
+        var url = "http://\(ip)/\(endp)"
+        print("Sending get request...")
+        guard let requestURL = URL(string: url) else {
+            completion(.failure(NSError(domain: "InvalidURL", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])))
+            return
+        }
+
+        URLSession.shared.dataTask(with: requestURL) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                completion(.failure(NSError(domain: "HTTPError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid HTTP response"])))
+                return
+            }
+
+            if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                completion(.success(responseString))
+            } else {
+                completion(.failure(NSError(domain: "DataError", code: 0, userInfo: [NSLocalizedDescriptionKey: "No data received or unable to parse data"])))
+            }
+        }.resume()
+    }
     func getJSON(ip:String,endp:String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
-        let url = URL(string: "http://\(ip):5001/\(endp)")!
+        let url = URL(string: "http://\(ip)/\(endp)")!
 
         URLSession.shared.dataTask(with: url) { data, _, error in
             if let error = error {
@@ -60,6 +86,8 @@ class DataEx
             json[value] = key
         }
         
+        print(json)
+        
         chatEX(ip:ip, endpoint: endpoint, json: json)
     }
 
@@ -69,7 +97,7 @@ class DataEx
 //            print(engine)
 //            print(String(format: "Engine: %@", engine))
             
-            let urlString = String(format: "http://%@:5001/%@", ip, endpoint) 
+            let urlString = String(format: "http://%@/%@", ip, endpoint)
             guard let url = URL(string: urlString) else {
                 sendNotification(title: "Mikoshi->Host", subtitle: "", body:"Invalid URL", id: "Mikoshi")
                 print("Invalid URL")
@@ -115,7 +143,7 @@ class DataEx
     }
     
     func neofetch(ip: String, completion: @escaping (Result<String, Error>) -> Void) {
-        guard let url = URL(string: "http://\(ip):5001/neofetch") else {
+        guard let url = URL(string: "http://\(ip)/neofetch") else {
             sendNotification(title: "Mikoshi-Host", subtitle: "", body:"Invalid URL", id: "Mikoshi")
             completion(.failure(NSError(domain: "Invalid URL", code: 0, userInfo: nil)))
             return

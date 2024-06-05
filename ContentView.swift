@@ -8,11 +8,11 @@
 import SwiftUI
 import Combine
 
-
 class IPModel: ObservableObject {
     static let shared = IPModel()
     @Published var ipAddress: String = "192.168.8.152"
 }
+
 struct ContentView: View {
     @ObservedObject private var ipAddr = IPModel.shared
     
@@ -23,10 +23,10 @@ struct ContentView: View {
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     @State private var locIP: String = "Loading..."
-
+    
     var body: some View {
         NavigationView {
-            ZStack{
+            ZStack {
                 LinearGradient(gradient: Gradient(colors: [.black, .black, Color(hex: 0xB30026)]), startPoint: .top, endPoint: .bottom)
                     .blur(radius: 80)
                     .ignoresSafeArea()
@@ -36,25 +36,12 @@ struct ContentView: View {
                             NetworkStuff().getLocalIPAddress { success in
                                 self.locIP = success ?? "Not available"
                             }
-                            
                         }
                     TextField("Enter server's local ip: ", text: $ipAddr.ipAddress)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding()
                     Button(action: {
-                        //                    print("Button Pressed!")
-                        NetworkStuff().checkIP(ip: ipAddr.ipAddress) { success in
-                            if success {
-                                isNextScreenActive = true
-                                HapticFeedbackSelection.heavy.trigger()
-                                //                            print("Request was successful!")
-                            } else {
-                                alertMessage = "No route to server"
-                                HapticFeedbackSelection.light.trigger()
-                                //                            print("Request failed.")
-                                showAlert = true
-                            }
-                        }
+                        authenticateAndSubmit()
                     }) {
                         Text("Submit")
                             .padding()
@@ -78,8 +65,27 @@ struct ContentView: View {
             }
         }
     }
+    
+    private func authenticateAndSubmit() {
+        faceauth { isAuthenticated in
+            if isAuthenticated {
+                NetworkStuff().checkIP(ip: ipAddr.ipAddress) { success in
+                    if success {
+                        isNextScreenActive = true
+                        HapticFeedbackSelection.heavy.trigger()
+                    } else {
+                        alertMessage = "No route to server"
+                        HapticFeedbackSelection.light.trigger()
+                        showAlert = true
+                    }
+                }
+            } else {
+                alertMessage = "Face ID Authentication Failed"
+                showAlert = true
+            }
+        }
+    }
 }
-
 #Preview {
     ContentView()
 }

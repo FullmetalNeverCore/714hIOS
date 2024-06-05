@@ -39,6 +39,8 @@ struct CharacterScreen: View{
     @State private var timer: Timer.TimerPublisher?
     @State private var cancellable: AnyCancellable?
     @State private var msgData: [[String: Any]]?
+    
+    @State private var showErrLog:Bool = false
 
     
     var body: some View {
@@ -168,6 +170,20 @@ struct CharacterScreen: View{
                     .foregroundColor(.red)
                     .cornerRadius(10)
                     .padding(.trailing)
+                    
+                    
+                    Button(action: {
+//                        print("Button Pressed!")
+                        self.showErrLog = true
+                        HapticFeedbackSelection.medium.trigger()
+                    }){
+                        Text("Error Handling")
+                    }
+                    .padding()
+                    .background(Color.black)
+                    .foregroundColor(.red)
+                    .cornerRadius(10)
+                    .padding(.trailing)
                 }
                 .padding(.bottom)
             }
@@ -176,10 +192,15 @@ struct CharacterScreen: View{
             print("Notification sent")
         }
         .onAppear(){
+
             DataEx().jsoCreate(ip:ipAddress,x: "N", y: "toor", z: name, xn: "username", xy: "password", xz: "char", endpoint: "verify_credentials")
         }
         .sheet(isPresented: $showBrain) {
             CharacterMemory(name:name,ipAddress:ipAddress,event:$events)
+            
+        }
+        .sheet(isPresented: $showErrLog) {
+            ErrorWindow(ipAddress: ipAddress)
             
         }
         .sheet(isPresented: $opnEngSttngs) {
@@ -244,6 +265,21 @@ struct CharacterScreen: View{
     }
 }
 
+func createCharacterNavigationLink(imageURL: URL, key: String, ipAddress: String) -> some View {
+    return NavigationLink(destination: CharacterScreen(link: imageURL, name: key, ipAddress: ipAddress)) {
+        VStack {
+            KFImage(imageURL)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 450, height: 450)
+                .clipped()
+            
+            Text("\(key):")
+                .bold()
+        }
+    }
+}
+
 
 struct CharacterMemory: View {
     var name: String
@@ -278,6 +314,29 @@ struct CharacterMemory: View {
                     .padding()
                     .foregroundColor(.black)
                     .background(Color.white)
+                    .cornerRadius(10)
+            }
+            Button(action: {
+//                print("Overwriting...")
+                //to be continued
+                HapticFeedbackSelection.heavy.trigger()
+                //just pinging endpoint,json not necessary
+                DataEx().getPing(ip:ipAddress, endp: "api/memoryreset/\(name)"){res in
+                    switch res {
+                    case .success(let data):
+                        print(data)
+                    case .failure(let error):
+                        print(error)
+                    }
+                
+                }
+                sendNotification(title: "Mikoshi->Host", subtitle: "", body:"Memory hard-reset.", id: "Mikoshi")
+                    
+            }) {
+                Text("Hard-Reset")
+                    .padding()
+                    .foregroundColor(.black)
+                    .background(Color.red)
                     .cornerRadius(10)
             }
         }

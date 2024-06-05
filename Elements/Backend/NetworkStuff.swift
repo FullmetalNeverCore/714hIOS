@@ -11,7 +11,7 @@ import Network
 class NetworkStuff{
     
     func checkIP(ip: String, completion: @escaping (Bool) -> Void) {
-        let endpointURL = URL(string: "http://\(ip):5001/char_list")!
+        let endpointURL = URL(string: "http://\(ip)/char_list")!
 
         var request = URLRequest(url: endpointURL)
         

@@ -13,25 +13,21 @@ struct EngineView: View {
     var logo : String
 
     @State private var selectedOption: RadioButtonSelection?
+
+    let options: [RadioButtonSelection] = [
+        .option1, .option2, .option3, .option4, .option5,
+        .option6, .option7, .option8, .option9, .option10,
+        .option11, .option12, .option13, .option14, .option15,
+        .option16
+    ]
     
-    // Enum to represent the selection state of the radio buttons
-    enum RadioButtonSelection: String, CaseIterable {
-        case option1 = "Mistral"
-        case option2 = "gpt-3.5-turbo"
-        case option3 = "gpt3"
-        case option4 = "alpindale/goliath-120b"
-        case option5 = "neversleep/noromaid-mixtral-8x7b-instruct"
-        case option6 = "openai/gpt-4-turbo-preview"
-        case option7 = "lizpreciatior/lzlv-70b-fp16-hf"
-        case option8 = "sophosympatheia/midnight-rose-70b"
-        case option9 = "jondurbin/airoboros-l2-70b"
-        case option10 = "neversleep/noromaid-20b"
-        case option11 = "koboldai/psyfighter-13b-2"
-    }
+    @State private var updateInput1 = UserDefaults.standard.string(forKey: "temp") ?? "1.0"
+    @State private var updateInput2 = UserDefaults.standard.string(forKey: "fpen") ?? "0.75"
+    @State private var updateInput3 = UserDefaults.standard.string(forKey: "ppen") ?? "0.75"
     
-    @State private var updateInput1 = ""
-    @State private var updateInput2 = ""
-    @State private var updateInput3 = ""
+    
+    @State private var api: String = UserDefaults.standard.string(forKey: "apiKey") ?? ""
+
     
 
     var body: some View {
@@ -39,18 +35,12 @@ struct EngineView: View {
             ZStack{
                 VStack {
                     List{
-                        EngineRadioButton(label: .option1, isSelected: $selectedOption)
-                        EngineRadioButton(label: .option2, isSelected: $selectedOption)
-                        EngineRadioButton(label: .option3, isSelected: $selectedOption)
-                        EngineRadioButton(label: .option4, isSelected: $selectedOption)
-                        EngineRadioButton(label: .option5, isSelected: $selectedOption)
-                        EngineRadioButton(label: .option6, isSelected: $selectedOption)
-                        EngineRadioButton(label: .option7, isSelected: $selectedOption)
-                        EngineRadioButton(label: .option8, isSelected: $selectedOption)
-                        EngineRadioButton(label: .option9, isSelected: $selectedOption)
-                        EngineRadioButton(label: .option10, isSelected: $selectedOption)
-                        EngineRadioButton(label: .option11, isSelected: $selectedOption)
+                        ForEach(options, id: \.self) { option in
+                            EngineRadioButton(label: option, isSelected: $selectedOption)
+                        }
+
                     }
+                    
                     Button("Submit") {
                         
                         if let selectedOption = selectedOption {
@@ -70,6 +60,34 @@ struct EngineView: View {
                     .foregroundColor(.white)
                     .cornerRadius(8)
                     
+                    TextField("api_key", text: $api)
+                        .background(Color.black.opacity(0.8))
+                        .cornerRadius(10)
+                        .padding(.horizontal)
+                    
+                    
+                  
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                        .padding(.trailing)
+                    
+                    Button("Set Key.") {
+                        
+                            UserDefaults.standard.set(api, forKey: "apiKey")
+                            HapticFeedbackSelection.heavy.trigger()
+                            sendNotification(title: "Mikoshi->Host", subtitle: "", body:"API KEY has been updated", id: "Mikoshi")
+                            
+                            DataEx().jsoCreate(ip:ipAddress,x: "null", y: "api", z: api, xn: "null", xy: "type", xz: "data", endpoint: "api/setakey")
+                        
+            
+                            
+                    }
+                    .padding()
+                    .background(Color.black)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                    
+                    
                     TextField("1.0", text: $updateInput1)
                         .padding()
                         .background(Color.black.opacity(0.8))
@@ -77,7 +95,7 @@ struct EngineView: View {
                         .padding(.horizontal)
                     
                     
-                        .padding()
+                  
                         .foregroundColor(.white)
                         .cornerRadius(10)
                         .padding(.trailing)
@@ -89,7 +107,7 @@ struct EngineView: View {
                         .padding(.horizontal)
                     
                     
-                        .padding()
+                    
                         .foregroundColor(.white)
                         .cornerRadius(10)
                         .padding(.trailing)
@@ -101,12 +119,15 @@ struct EngineView: View {
                         .padding(.horizontal)
                     
                     
-                        .padding()
+                 
                         .foregroundColor(.white)
                         .cornerRadius(10)
                         .padding(.trailing)
                     
                     Button("Update") {
+                        UserDefaults.standard.set(updateInput1, forKey: "temp")
+                        UserDefaults.standard.set(updateInput2, forKey: "fpen")
+                        UserDefaults.standard.set(updateInput3, forKey: "ppen")
                         print("Update 3: \(updateInput1) \(updateInput2) \(updateInput3)")
                         HapticFeedbackSelection.heavy.trigger()
                         sendNotification(title: "Mikoshi->Host", subtitle: "", body:"NN values has been updated!", id: "Mikoshi")
@@ -141,8 +162,8 @@ struct EngineView: View {
 }
 
 struct EngineRadioButton: View {
-    let label: EngineView.RadioButtonSelection
-    @Binding var isSelected: EngineView.RadioButtonSelection?
+    let label: RadioButtonSelection
+    @Binding var isSelected: RadioButtonSelection?
 
     var body: some View {
         HStack {

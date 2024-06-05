@@ -23,6 +23,10 @@ struct NextScreen: View {
     
     @State private var charData: [[String: Any]]?
     
+    @State private var filterState: Bool = false
+    
+    @State private var filter: String  = ""
+    
     @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
@@ -54,7 +58,9 @@ struct NextScreen: View {
                         Text("Invalid image URL")
                     }
                     
-                    
+                    Text("v1.21")
+                        .font(.headline)
+                        .padding()
                     Text("Host Address:\(ipAddr.ipAddress)")
                         .font(.headline)
                         .padding()
@@ -76,6 +82,10 @@ struct NextScreen: View {
                             Text("Server Info")
                                 .foregroundColor(.white)
                         }
+                        TextField("Search engramm...", text: $filter)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .padding(.horizontal)
+                
                     }
                     List {
                         if let charData = charData {
@@ -84,24 +94,9 @@ struct NextScreen: View {
                                     if let value = charData[index][key] as? String,
                                        let imageURL = URL(string: value) {
                                         
-                                        NavigationLink(destination: CharacterScreen(link: imageURL, name: key, ipAddress: ipAddress)) {
-                                            VStack {
-                                                KFImage(imageURL)
-                                                    .resizable()
-                                                    .aspectRatio(contentMode: .fit)
-                                                    .ignoresSafeArea()
-                                                    .frame(width: 450, height: 450)
-
-                                                Text("\(key):")
-                                                    .bold()
-                                            }
+                                        if filter.isEmpty || key.contains(filter) {
+                                            createCharacterNavigationLink(imageURL: imageURL, key: key, ipAddress: ipAddress)
                                         }
-//                                        .listRowBackground(LinearGradient(gradient: Gradient(colors: [.black, .red]), startPoint: .top, endPoint: .bottom)
-//                                            .blur(radius: 10)
-//                                            .ignoresSafeArea()
-//                                            .edgesIgnoringSafeArea(.all))
-                                    } else {
-                                        Text("Invalid image URL")
                                     }
                                 }
                             }
