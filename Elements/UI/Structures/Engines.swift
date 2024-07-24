@@ -25,4 +25,5 @@ enum RadioButtonSelection: String, CaseIterable {
     case option14 = "lynn/soliloquy-l3"
     case option15 = "neversleep/llama-3-lumimaid-70b"
     case option16 = "openai/gpt-4o"
+    case option17 = "sao10k/l3-euryale-70b"
 }

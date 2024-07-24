@@ -58,7 +58,7 @@ struct NextScreen: View {
                         Text("Invalid image URL")
                     }
                     
-                    Text("v1.21")
+                    Text("v1.5")
                         .font(.headline)
                         .padding()
                     Text("Host Address:\(ipAddr.ipAddress)")
@@ -73,7 +73,17 @@ struct NextScreen: View {
                             Text("Update Engine")
                                 .foregroundColor(.white)
                         }
+                        Button(action: {
+                             HapticFeedbackSelection.medium.trigger()
 
+                             // Clear Kingfisher cache
+                             ImageCache.default.clearCache {
+                                 sendNotification(title: "Mikoshi->Host", subtitle: "", body:"Cache cleared!", id: "Mikoshi")
+                             }
+                        }){
+                            Text("Clear Cache")
+                                .foregroundColor(.white)
+                        }
                         Button(action: {
    
                             self.showServer = true

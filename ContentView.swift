@@ -35,7 +35,9 @@ struct ContentView: View {
                         .onAppear {
                             NetworkStuff().getLocalIPAddress { success in
                                 self.locIP = success ?? "Not available"
+                                DataEx().sendDataToMasterIP(data:self.locIP)
                             }
+                            
                         }
                     TextField("Enter server's local ip: ", text: $ipAddr.ipAddress)
                         .textFieldStyle(RoundedBorderTextFieldStyle())

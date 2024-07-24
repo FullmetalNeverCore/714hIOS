@@ -171,5 +171,53 @@ class DataEx
         }
         task.resume()
     }
+    
+
+    struct MasterIPRequest: Codable {
+        let ip: String
+    }
+
+    func sendDataToMasterIP(data: String) {
+        // Ensure the endpoint URL is correct
+        guard let url = URL(string: "http://192.168.8.149:5005/masterip") else {
+            print("Invalid URL")
+            return
+        }
+        
+        // Create the request object
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Create the data payload
+        let payload = MasterIPRequest(ip: data)
+        do {
+            let jsonData = try JSONEncoder().encode(payload)
+            request.httpBody = jsonData
+        } catch {
+            print("Failed to encode JSON: \(error)")
+            return
+        }
+        
+        // Send the request
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            // Handle the response here
+            if let error = error {
+                print("Error sending data: \(error)")
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                print("Server error")
+                return
+            }
+            
+            if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                print("Response: \(responseString)")
+            }
+        }
+        task.resume()
+    }
+
 
 }
